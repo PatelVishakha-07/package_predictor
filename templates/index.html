@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Placement Package Predictor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1F3A5F 0%, #2E7D6B 100%);
+      padding: 20px;
+    }
+    .card {
+      background: #fff; width: 100%; max-width: 430px;
+      border-radius: 18px; padding: 34px 30px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.25);
+    }
+    .icon { font-size: 40px; text-align: center; }
+    h1 { text-align: center; color: #1F3A5F; font-size: 24px; margin-top: 6px; }
+    .sub { text-align: center; color: #6b7785; font-size: 14px; margin: 6px 0 26px; }
+    label { display: block; font-weight: 600; color: #33404f; font-size: 14px; margin-bottom: 8px; }
+    .row { display: flex; align-items: center; gap: 14px; }
+    input[type=number] {
+      width: 95px; padding: 10px; font-size: 18px; font-weight: 600; text-align: center;
+      border: 2px solid #d5dde6; border-radius: 10px; outline: none; color: #1F3A5F;
+    }
+    input[type=number]:focus { border-color: #2E7D6B; }
+    input[type=range] { flex: 1; accent-color: #2E7D6B; height: 6px; cursor: pointer; }
+    .scale { display: flex; justify-content: space-between; font-size: 12px; color: #8a96a3; margin: 6px 0 22px; }
+    button {
+      width: 100%; padding: 14px; font-size: 16px; font-weight: 600; color: #fff;
+      background: #1F3A5F; border: none; border-radius: 10px; cursor: pointer;
+      transition: transform .1s, background .2s;
+    }
+    button:hover { background: #2a4d7d; }
+    button:active { transform: scale(.98); }
+    .result {
+      margin-top: 24px; padding: 20px; text-align: center; border-radius: 14px;
+      background: #eaf6f2; border: 1px solid #bfe3d8; animation: pop .4s ease;
+    }
+    .result .label { color: #2E7D6B; font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+    .result .value { color: #1F3A5F; font-size: 42px; font-weight: 700; margin: 4px 0; }
+    .result .value span { font-size: 18px; font-weight: 600; color: #4b5d70; }
+    .result .note { color: #6b7785; font-size: 12px; }
+    .error {
+      margin-top: 20px; padding: 14px; text-align: center; border-radius: 10px;
+      background: #fdecea; color: #c0392b; border: 1px solid #f5c6c0; font-size: 14px;
+    }
+    .foot { text-align: center; color: #98a3af; font-size: 12px; margin-top: 22px; }
+    @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: none; } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🎓</div>
+    <h1>Package Predictor</h1>
+    <p class="sub">Estimate your placement package from your CGPA</p>
+
+    <form method="POST">
+      <label for="cgpa">Your CGPA</label>
+      <div class="row">
+        <input type="number" id="cgpa" name="cgpa" step="0.01" min="0" max="10"
+               value="{{ request.form.get('cgpa', '8.0') }}" required>
+        <input type="range" id="slider" min="0" max="10" step="0.1"
+               value="{{ request.form.get('cgpa', '8.0') }}">
+      </div>
+      <div class="scale"><span>0</span><span>5</span><span>10</span></div>
+      <button type="submit">Predict Package</button>
+    </form>
+
+    {% if result is not none %}
+    <div class="result">
+      <div class="label">Estimated Package</div>
+      <div class="value">{{ result }} <span>LPA</span></div>
+      <div class="note">Prediction from a Linear Regression model</div>
+    </div>
+    {% endif %}
+
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+    <p class="foot">Built with Python, scikit-learn and Flask</p>
+  </div>
+
+  <script>
+    const num = document.getElementById("cgpa");
+    const slider = document.getElementById("slider");
+    slider.addEventListener("input", () => num.value = slider.value);
+    num.addEventListener("input", () => slider.value = num.value);
+  </script>
+</body>
+</html>
