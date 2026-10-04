@@ -16,4 +16,3 @@ y_predict = lr.predict(x_test)
 m = lr.coef_
 b = lr.intercept_
 
-a
